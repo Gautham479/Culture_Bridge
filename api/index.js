@@ -15,13 +15,12 @@ const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
-});
+// Health check endpoints
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// Main rewrite endpoint
-app.post('/api/rewrite', async (req, res) => {
+// Main rewrite endpoints
+const handleRewrite = async (req, res) => {
     const { message, culture, tone } = req.body;
 
     if (!message || !culture || !tone) {
@@ -75,10 +74,13 @@ Etiquette Tip: [Short etiquette tip based on target culture]`;
         res.json(responseData);
 
     } catch (error) {
-        console.error('Error in /api/rewrite endpoint:', error);
+        console.error('Error in rewrite handler:', error);
         res.status(500).json({ error: 'Failed to rewrite message. Please try again.' });
     }
-});
+};
+
+app.post('/api/rewrite', handleRewrite);
+app.post('/rewrite', handleRewrite);
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
