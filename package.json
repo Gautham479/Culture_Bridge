@@ -1,0 +1,16 @@
+{
+  "name": "culture-bridge-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm install && npm run build",
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "groq-sdk": "^0.3.3"
+  }
+}

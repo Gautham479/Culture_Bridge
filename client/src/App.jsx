@@ -5,7 +5,7 @@ import CulturalForm from './components/CulturalForm';
 import ResultCard from './components/ResultCard';
 import ComparisonView from './components/ComparisonView';
 
-const API_URL = 'http://localhost:5000/rewrite';
+const API_URL = '/api/rewrite';
 
 function App() {
   const [activeTab, setActiveTab] = useState('single'); // 'single' | 'compare'
