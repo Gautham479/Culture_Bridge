@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Culture Bridge – Cross-Cultural Communication Assistant</title>
+  <meta name="description" content="AI-powered tool to rewrite messages for different cultures and tones using Groq AI."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #6366f1;
+      --indigo-dark: #4f46e5;
+      --purple: #8b5cf6;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Gradient blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: var(--indigo);
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: var(--purple);
+      bottom: -100px; right: -100px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header { text-align: center; margin-bottom: 44px; }
+    .logo {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      border-radius: 18px;
+      font-size: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(99,102,241,0.3);
+    }
+    header h1 {
+      font-size: clamp(26px, 5vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    header h1 span {
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 500px;
+      margin-inline: auto;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 5px;
+      width: fit-content;
+      margin: 0 auto 36px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .tab-btn {
+      padding: 9px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      color: white;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    }
+    .tab-btn:not(.active):hover { color: var(--text); background: var(--bg); }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 20px;
+    }
+    textarea:focus, select:focus {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 540px) { .row { grid-template-columns: 1fr; } }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      color: white;
+      box-shadow: 0 6px 20px rgba(99,102,241,0.35);
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result */
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+      animation: fadeUp 0.4s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .result-header .flag { font-size: 28px; }
+    .result-header h3 { font-size: 17px; font-weight: 700; }
+
+    .result-message {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .result-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 540px) { .result-meta { grid-template-columns: 1fr; } }
+
+    .meta-box {
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .meta-box .meta-label {
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .meta-box.explain { background: #fffbeb; border: 1px solid #fde68a; }
+    .meta-box.explain .meta-label { color: #92400e; }
+    .meta-box.tip { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .meta-box.tip .meta-label { color: #065f46; }
+
+    /* Error */
+    .error-box {
+      background: #fef2f2; border: 1px solid #fecaca;
+      color: #b91c1c; border-radius: 12px; padding: 14px 18px;
+      font-size: 14px; margin-bottom: 20px; text-align: center;
+    }
+
+    /* Compare grid */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    /* API key note */
+    .api-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .api-note a { color: var(--indigo); text-decoration: none; font-weight: 600; }
+    .api-note a:hover { text-decoration: underline; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="logo">🌍</div>
+      <h1>Culture Bridge<br/><span>Communication Assistant</span></h1>
+      <p>Rewrite your messages to match any culture's communication style, powered by Groq AI.</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-single" onclick="switchTab('single')">⚡ Single Rewrite</button>
+      <button class="tab-btn" id="tab-compare" onclick="switchTab('compare')">🌐 Compare Cultures</button>
+    </div>
+
+    <!-- SINGLE TAB -->
+    <div id="panel-single">
+      <div class="card">
+        <label for="api-key">Groq API Key</label>
+        <input type="password" id="api-key" placeholder="gsk_..." style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:15px;color:var(--text);background:var(--bg);outline:none;margin-bottom:20px;transition:border-color 0.2s;"/>
+
+        <label for="message">Your Message</label>
+        <textarea id="message" placeholder="e.g. I need this report by tomorrow or we will miss the deadline."></textarea>
+
+        <div class="row">
+          <div>
+            <label for="culture">Target Culture</label>
+            <select id="culture">
+              <option value="USA">🇺🇸 USA</option>
+              <option value="Japan">🇯🇵 Japan</option>
+              <option value="India">🇮🇳 India</option>
+              <option value="Germany">🇩🇪 Germany</option>
+            </select>
+          </div>
+          <div>
+            <label for="tone">Desired Tone</label>
+            <select id="tone">
+              <option value="Professional">Professional</option>
+              <option value="Formal">Formal</option>
+              <option value="Casual">Casual</option>
+              <option value="Friendly">Friendly</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="error-box hidden" id="single-error"></div>
+        <button class="btn" id="single-btn" onclick="doSingleRewrite()">
+          <span>✈️ Rewrite Message</span>
+        </button>
+        <p class="api-note">Get your free API key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></p>
+      </div>
+
+      <div id="single-result"></div>
+    </div>
+
+    <!-- COMPARE TAB -->
+    <div id="panel-compare" class="hidden">
+      <div class="card">
+        <label for="api-key-c">Groq API Key</label>
+        <input type="password" id="api-key-c" placeholder="gsk_..." style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:15px;color:var(--text);background:var(--bg);outline:none;margin-bottom:20px;"/>
+
+        <label for="message-c">Your Message</label>
+        <textarea id="message-c" placeholder="e.g. We need to discuss your performance."></textarea>
+
+        <div style="margin-bottom:20px">
+          <label for="tone-c">Base Tone</label>
+          <select id="tone-c">
+            <option value="Professional">Professional</option>
+            <option value="Formal">Formal</option>
+            <option value="Casual">Casual</option>
+            <option value="Friendly">Friendly</option>
+          </select>
+        </div>
+
+        <div class="error-box hidden" id="compare-error"></div>
+        <button class="btn" id="compare-btn" onclick="doCompare()">
+          <span>🌐 Compare All Cultures</span>
+        </button>
+        <p class="api-note">Get your free API key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></p>
+      </div>
+
+      <div id="compare-result" class="compare-grid"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const FLAGS = { USA: '🇺🇸', Japan: '🇯🇵', India: '🇮🇳', Germany: '🇩🇪' };
+
+    function switchTab(tab) {
+      document.getElementById('panel-single').classList.toggle('hidden', tab !== 'single');
+      document.getElementById('panel-compare').classList.toggle('hidden', tab !== 'compare');
+      document.getElementById('tab-single').classList.toggle('active', tab === 'single');
+      document.getElementById('tab-compare').classList.toggle('active', tab !== 'single');
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div><span>Thinking...</span>';
+      } else {
+        btn.disabled = false;
+      }
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+    function hideError(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    async function callGroq(apiKey, message, culture, tone) {
+      const systemPrompt = `You are a Cross-Cultural Communication Assistant. Rewrite messages to match the communication style of the target culture.
+Adjust tone, politeness, directness, and formality.
+Target culture: ${culture}
+Tone: ${tone}
+Instructions:
+* Keep it professional and respectful
+* Avoid stereotypes
+* Be concise and practical
+
+Output format (use exactly these labels):
+Rewritten Message: [your rewritten message]
+Explanation: [short explanation of why tone changed]
+Etiquette Tip: [one practical etiquette tip for this culture]`;
+
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          temperature: 0.7,
+          max_tokens: 1024,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Rewrite this message:\n\n${message}` }
+          ]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `API error ${res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data.choices[0]?.message?.content || '';
+
+      const rewrittenMatch = text.match(/Rewritten Message:\s*([\s\S]*?)(?=\nExplanation:|$)/i);
+      const explanationMatch = text.match(/Explanation:\s*([\s\S]*?)(?=\nEtiquette Tip:|$)/i);
+      const tipMatch = text.match(/Etiquette Tip:\s*([\s\S]*?)$/i);
+
+      return {
+        rewritten: rewrittenMatch ? rewrittenMatch[1].trim() : text,
+        explanation: explanationMatch ? explanationMatch[1].trim() : '',
+        tip: tipMatch ? tipMatch[1].trim() : ''
+      };
+    }
+
+    function buildResultCard(culture, data) {
+      return `
+        <div class="result-card">
+          <div class="result-header">
+            <span class="flag">${FLAGS[culture] || '🌐'}</span>
+            <h3>Rewritten for ${culture}</h3>
+          </div>
+          <div class="result-message">${data.rewritten}</div>
+          <div class="result-meta">
+            <div class="meta-box explain">
+              <div class="meta-label">💡 Why it changed</div>
+              <div>${data.explanation}</div>
+            </div>
+            <div class="meta-box tip">
+              <div class="meta-label">🌍 Etiquette Tip</div>
+              <div>${data.tip}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function doSingleRewrite() {
+      const apiKey = document.getElementById('api-key').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const culture = document.getElementById('culture').value;
+      const tone = document.getElementById('tone').value;
+
+      hideError('single-error');
+      if (!apiKey) return showError('single-error', '⚠️ Please enter your Groq API key.');
+      if (!message) return showError('single-error', '⚠️ Please enter a message to rewrite.');
+
+      setLoading('single-btn', true);
+      document.getElementById('single-result').innerHTML = '';
+      try {
+        const result = await callGroq(apiKey, message, culture, tone);
+        document.getElementById('single-result').innerHTML = buildResultCard(culture, result);
+      } catch(e) {
+        showError('single-error', `❌ ${e.message}`);
+      } finally {
+        setLoading('single-btn', false);
+        document.getElementById('single-btn').innerHTML = '<span>✈️ Rewrite Message</span>';
+      }
+    }
+
+    async function doCompare() {
+      const apiKey = document.getElementById('api-key-c').value.trim();
+      const message = document.getElementById('message-c').value.trim();
+      const tone = document.getElementById('tone-c').value;
+
+      hideError('compare-error');
+      if (!apiKey) return showError('compare-error', '⚠️ Please enter your Groq API key.');
+      if (!message) return showError('compare-error', '⚠️ Please enter a message to compare.');
+
+      setLoading('compare-btn', true);
+      const grid = document.getElementById('compare-result');
+      grid.innerHTML = '';
+
+      const cultures = ['USA', 'Japan', 'India', 'Germany'];
+      const placeholders = {};
+      cultures.forEach(c => {
+        const div = document.createElement('div');
+        div.innerHTML = `<div class="result-card" style="display:flex;align-items:center;justify-content:center;min-height:180px;flex-direction:column;gap:12px;color:var(--muted)"><div class="spinner" style="border-color:rgba(99,102,241,.2);border-top-color:var(--indigo)"></div><span>${FLAGS[c]} Generating for ${c}…</span></div>`;
+        grid.appendChild(div);
+        placeholders[c] = div;
+      });
+
+      await Promise.all(cultures.map(async (culture) => {
+        try {
+          const result = await callGroq(apiKey, message, culture, tone);
+          placeholders[culture].innerHTML = buildResultCard(culture, result);
+        } catch(e) {
+          placeholders[culture].innerHTML = `<div class="result-card"><div class="error-box" style="margin:0">❌ ${e.message}</div></div>`;
+        }
+      }));
+
+      setLoading('compare-btn', false);
+      document.getElementById('compare-btn').innerHTML = '<span>🌐 Compare All Cultures</span>';
+    }
+  </script>
+</body>
+</html>
